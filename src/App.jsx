@@ -7,6 +7,7 @@ import VoiceRecorder from './components/VoiceRecorder';
 import ProgressTracker from './components/ProgressTracker';
 import SttSupportBanner from './components/SttSupportBanner';
 import ReciterSelector from './components/ReciterSelector';
+import SettingsSheet from './components/SettingsSheet';
 import { modules, getSurahById, getAyahBySurahAndNumber } from './data/quranData';
 import { loadProgress, saveProgress } from './utils/storage';
 
@@ -18,6 +19,15 @@ function App() {
   const [selectedReciterId, setSelectedReciterId] = useState(() => {
     return parseInt(localStorage.getItem('iqra.reciterId') || '5', 10);
   });
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('iqra.settings');
+    return saved ? JSON.parse(saved) : {
+      showTajweed: true,
+      largeArabicFont: false,
+      dataSourcePreference: 'Auto'
+    };
+  });
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [progress, setProgress] = useState({});
   const [practiceSession, setPracticeSession] = useState({
     attempts: 0,
@@ -41,6 +51,12 @@ function App() {
   const handleReciterChange = (reciterId) => {
     setSelectedReciterId(reciterId);
     localStorage.setItem('iqra.reciterId', reciterId.toString());
+  };
+
+  // Handle settings changes and persist to localStorage
+  const handleSettingsChange = (newSettings) => {
+    setSettings(newSettings);
+    localStorage.setItem('iqra.settings', JSON.stringify(newSettings));
   };
 
   const handleModuleSelect = (module) => {
@@ -129,7 +145,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      <Header onSettingsClick={() => setIsSettingsOpen(true)} />
       
       <div className="container">
         <SttSupportBanner />
@@ -180,6 +196,7 @@ function App() {
                     ayahNumber={selectedAyah}
                     surahNumber={selectedSurah}
                     selectedReciterId={selectedReciterId}
+                    settings={settings}
                   />
                 )}
 
@@ -201,6 +218,13 @@ function App() {
             </div>
           </div>
         )}
+
+        <SettingsSheet
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          settings={settings}
+          onSettingsChange={handleSettingsChange}
+        />
       </div>
     </div>
   );

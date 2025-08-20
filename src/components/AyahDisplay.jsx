@@ -3,8 +3,9 @@ import { Volume2 } from 'lucide-react';
 import { sanitizeTajweedHtml } from '../utils/sanitizeHtml';
 import { getAudioUrl } from '../api/quranClient';
 
-const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciterId = 5 }) => {
-  const [showTajweed, setShowTajweed] = useState(true);
+const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciterId = 5, settings }) => {
+  const showTajweed = settings?.showTajweed ?? true;
+  const largeArabicFont = settings?.largeArabicFont ?? false;
 
   const renderTajweedText = () => {
     // New: Check for tajweedHtml (from Quran Foundation API) first
@@ -90,23 +91,18 @@ const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciter
               >
                 Play
               </button>
-              <button
-                onClick={() => setShowTajweed(v => !v)}
-                style={{ 
-                  padding: '0.5rem', 
-                  fontSize: '0.75rem',
-                  background: 'none',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-                title="Toggle tajweed colors"
-              >
-                {showTajweed ? "Hide Tajwīd" : "Show Tajwīd"}
-              </button>
+              
             </div>
           </div>
-          <div className="arabic-text ayah-text" dir="rtl" lang="ar">
+          <div 
+            className="arabic-text ayah-text" 
+            dir="rtl" 
+            lang="ar"
+            style={{
+              fontSize: largeArabicFont ? '1.75rem' : '1.35rem',
+              lineHeight: largeArabicFont ? '2.75rem' : '2.25rem'
+            }}
+          >
             {renderTajweedText()}
           </div>
         </div>
