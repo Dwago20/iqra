@@ -212,3 +212,12 @@ This project is for educational purposes. The Quranic text is in the public doma
 **Made with ❤️ for learning and education**
 
 *"Read! In the name of your Lord who created." - Quran 96:1*
+
+git init
+git remote add origin https://github.com/Dwago20/iqra.git
+git add .
+git commit -m "Initial commit - Iqra app"
+git branch -M main
+git push -u origin main
+
+
