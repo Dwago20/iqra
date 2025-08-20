@@ -1,18 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Volume2 } from 'lucide-react';
+import { sanitizeTajweedHtml } from '../utils/sanitizeHtml';
+import { getAudioUrl } from '../api/quranClient';
 
-const AyahDisplay = ({ ayah, surahName, ayahNumber }) => {
+const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber }) => {
+  const [showTajweed, setShowTajweed] = useState(true);
+  const [selectedReciter] = useState(5); // Default Mishary
+
   const renderTajweedText = () => {
-    if (!ayah.tajweed) {
-      return <span>{ayah.arabic}</span>;
+    // New: Check for tajweedHtml (from Quran Foundation API) first
+    if (showTajweed && ayah.tajweedHtml) {
+      return (
+        <span
+          className="tajweed-colored"
+          dangerouslySetInnerHTML={{ __html: sanitizeTajweedHtml(ayah.tajweedHtml) }}
+        />
+      );
     }
     
-    return ayah.tajweed.map((segment, index) => (
-      <span key={index} className={segment.class}>
-        {segment.text}
-        {index < ayah.tajweed.length - 1 ? ' ' : ''}
-      </span>
-    ));
+    // Legacy: Check for local tajweed array structure
+    if (showTajweed && ayah.tajweed) {
+      return ayah.tajweed.map((segment, index) => (
+        <span key={index} className={segment.class}>
+          {segment.text}
+          {index < ayah.tajweed.length - 1 ? ' ' : ''}
+        </span>
+      ));
+    }
+    
+    // Fallback: Plain Arabic text
+    return <span className="plain-arabic">{ayah.arabic || ayah.textArabic}</span>;
   };
 
   const speakText = (text) => {
@@ -45,16 +62,48 @@ const AyahDisplay = ({ ayah, surahName, ayahNumber }) => {
             <h4 style={{ margin: 0, fontSize: '1rem', color: '#6b7280' }}>
               Arabic Text
             </h4>
-            <button
-              className="button secondary"
-              onClick={() => speakText(ayah.arabic)}
-              style={{ padding: '0.5rem', fontSize: '0.8rem' }}
-              title="Listen to Arabic pronunciation"
-            >
-              <Volume2 size={16} />
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                className="button secondary"
+                onClick={() => speakText(ayah.arabic || ayah.textArabic)}
+                style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                title="Listen to Arabic pronunciation (TTS)"
+              >
+                <Volume2 size={16} />
+              </button>
+              <button
+                className="button secondary"
+                onClick={() => {
+                  const url = getAudioUrl({
+                    surahNumber: surahNumber,
+                    ayahNumber: ayahNumber,
+                    reciterId: selectedReciter,
+                  });
+                  const audio = new Audio(url);
+                  audio.play().catch(console.warn);
+                }}
+                style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                title="Play recitation audio"
+              >
+                Play
+              </button>
+              <button
+                onClick={() => setShowTajweed(v => !v)}
+                style={{ 
+                  padding: '0.5rem', 
+                  fontSize: '0.75rem',
+                  background: 'none',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+                title="Toggle tajweed colors"
+              >
+                {showTajweed ? "Hide Tajwīd" : "Show Tajwīd"}
+              </button>
+            </div>
           </div>
-          <div className="arabic-text">
+          <div className="arabic-text ayah-text" dir="rtl" lang="ar">
             {renderTajweedText()}
           </div>
         </div>

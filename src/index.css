@@ -302,9 +302,30 @@ body {
   border-bottom: 2px solid var(--tajweed-iqlab);
   padding-bottom: 2px;
 }
-.tajweed-silent { 
-  color: var(--tajweed-silent); 
+.tajweed-silent {
+  color: var(--tajweed-silent);
   opacity: 0.7;
+}
+
+/* Arabic text baseline */
+.ayah-text {
+  font-size: 1.35rem;
+  line-height: 2.25rem;
+  text-align: right;
+  /* Prefer Arabic serif if available, then fall back */
+  font-family: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
+  margin-block: 0.5rem 1rem;
+}
+
+/* When QF tajweed HTML is used */
+.ayah-text .tajweed-colored span {
+  /* QF already color-codes via classes; keep spacing nice */
+  padding-inline: 1px;
+}
+
+/* If you ever render plain Arabic fallback */
+.plain-arabic {
+  letter-spacing: 0.1px;
 }
 
 /* Highlight for mismatched text */
