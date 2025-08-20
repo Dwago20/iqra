@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#2563eb"/>
+  
+  <!-- Book -->
+  <rect x="128" y="96" width="256" height="320" rx="16" fill="#ffffff"/>
+  <rect x="128" y="96" width="32" height="320" fill="#e5e7eb"/>
+  
+  <!-- Arabic text "إقرأ" (Iqra) -->
+  <text x="256" y="220" text-anchor="middle" fill="#2563eb" font-size="48" font-weight="bold" font-family="Arial">إقرأ</text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="260" text-anchor="middle" fill="#6b7280" font-size="24" font-family="Arial">Learn Quran</text>
+  
+  <!-- Microphone icon -->
+  <circle cx="320" cy="350" r="24" fill="#10b981"/>
+  <rect x="314" y="340" width="12" height="20" rx="6" fill="#ffffff"/>
+  <rect x="318" y="365" width="4" height="8" fill="#ffffff"/>
+  <rect x="312" y="370" width="16" height="3" rx="1.5" fill="#ffffff"/>
+  
+  <!-- Sound waves -->
+  <path d="M 350 330 Q 360 340 350 350 Q 360 360 350 370" stroke="#10b981" stroke-width="3" fill="none"/>
+  <path d="M 360 320 Q 375 340 360 360 Q 375 380 360 400" stroke="#10b981" stroke-width="2" fill="none"/>
+</svg>

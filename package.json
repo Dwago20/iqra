@@ -1,0 +1,35 @@
+{
+  "name": "iqra-quran-learning",
+  "version": "1.0.0",
+  "description": "A Quran learning web app with voice recognition and progress tracking",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "serve -s dist",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "serve": "^14.2.1",
+    "vite": "^4.4.5",
+    "vite-plugin-pwa": "^0.16.4",
+    "vitest": "^0.34.6"
+  },
+  "keywords": [
+    "quran",
+    "learning",
+    "pwa",
+    "speech-recognition"
+  ],
+  "author": "Iqra App",
+  "license": "MIT"
+}

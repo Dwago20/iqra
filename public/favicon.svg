@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#2563eb"/>
+  <rect x="8" y="6" width="16" height="20" rx="2" fill="#ffffff"/>
+  <rect x="8" y="6" width="2" height="20" fill="#e5e7eb"/>
+  <text x="16" y="18" text-anchor="middle" fill="#2563eb" font-size="8" font-weight="bold" font-family="Arial">إقرأ</text>
+  <circle cx="22" cy="24" r="3" fill="#10b981"/>
+  <rect x="21" y="22" width="2" height="4" rx="1" fill="#ffffff"/>
+</svg>

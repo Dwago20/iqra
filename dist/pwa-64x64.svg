@@ -1,0 +1,9 @@
+
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="6.4" fill="#2563eb"/>
+  <rect x="12.8" y="9.6" width="38.4" height="44.8" rx="1.28" fill="#ffffff"/>
+  <rect x="12.8" y="9.6" width="5.12" height="44.8" fill="#e5e7eb"/>
+  <text x="32" y="28.8" text-anchor="middle" fill="#2563eb" font-size="6.4" font-weight="bold" font-family="Arial">إقرأ</text>
+  <circle cx="44.8" cy="48" r="3.84" fill="#10b981"/>
+  <rect x="43.52" y="46.08" width="2.56" height="3.84" rx="0.64" fill="#ffffff"/>
+</svg>
