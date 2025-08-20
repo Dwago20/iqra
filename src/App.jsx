@@ -6,6 +6,7 @@ import AyahDisplay from './components/AyahDisplay';
 import VoiceRecorder from './components/VoiceRecorder';
 import ProgressTracker from './components/ProgressTracker';
 import SttSupportBanner from './components/SttSupportBanner';
+import ReciterSelector from './components/ReciterSelector';
 import { modules, getSurahById, getAyahBySurahAndNumber } from './data/quranData';
 import { loadProgress, saveProgress } from './utils/storage';
 
@@ -14,6 +15,9 @@ function App() {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [selectedAyah, setSelectedAyah] = useState(1);
+  const [selectedReciterId, setSelectedReciterId] = useState(() => {
+    return parseInt(localStorage.getItem('iqra.reciterId') || '5', 10);
+  });
   const [progress, setProgress] = useState({});
   const [practiceSession, setPracticeSession] = useState({
     attempts: 0,
@@ -32,6 +36,12 @@ function App() {
   useEffect(() => {
     saveProgress(progress);
   }, [progress]);
+
+  // Handle reciter selection and persist to localStorage
+  const handleReciterChange = (reciterId) => {
+    setSelectedReciterId(reciterId);
+    localStorage.setItem('iqra.reciterId', reciterId.toString());
+  };
 
   const handleModuleSelect = (module) => {
     setSelectedModule(module);
@@ -132,14 +142,25 @@ function App() {
           />
         ) : (
           <div className="practice-view">
-            <div className="practice-header mb-4">
-              <button 
-                className="button secondary"
-                onClick={goBackToModules}
-              >
-                ← Back to Modules
-              </button>
-              <h2>{selectedModule?.name}</h2>
+            <div className="practice-header mb-4" style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button 
+                  className="button secondary"
+                  onClick={goBackToModules}
+                >
+                  ← Back to Modules
+                </button>
+                <h2 style={{ margin: 0 }}>{selectedModule?.name}</h2>
+              </div>
+              <ReciterSelector
+                selectedReciterId={selectedReciterId}
+                onReciterChange={handleReciterChange}
+              />
             </div>
 
             <div className="grid grid-2">
@@ -158,6 +179,7 @@ function App() {
                     surahName={currentSurahData?.name}
                     ayahNumber={selectedAyah}
                     surahNumber={selectedSurah}
+                    selectedReciterId={selectedReciterId}
                   />
                 )}
 

@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+# IQRA rules
+- Always prefer data sources in this order:
+  1) Quran.com API v4 (no auth)
+  2) Quran Foundation Content API v4 (when VITE_QF_* present)
+  3) Tanzil static JSON
+  4) Local sample
+- Use getAudioUrl() for chapter audio; prefer QF chapter_reciter_audio_file then Quran.com fallback.
+- Render tajwīd using text_uthmani_tajweed (sanitized) when available.
+- Use git-ops MCP for commits/branches and shell MCP for npm scripts.
+

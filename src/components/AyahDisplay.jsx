@@ -3,9 +3,8 @@ import { Volume2 } from 'lucide-react';
 import { sanitizeTajweedHtml } from '../utils/sanitizeHtml';
 import { getAudioUrl } from '../api/quranClient';
 
-const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber }) => {
+const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciterId = 5 }) => {
   const [showTajweed, setShowTajweed] = useState(true);
-  const [selectedReciter] = useState(5); // Default Mishary
 
   const renderTajweedText = () => {
     // New: Check for tajweedHtml (from Quran Foundation API) first
@@ -73,14 +72,18 @@ const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber }) => {
               </button>
               <button
                 className="button secondary"
-                onClick={() => {
-                  const url = getAudioUrl({
-                    surahNumber: surahNumber,
-                    ayahNumber: ayahNumber,
-                    reciterId: selectedReciter,
-                  });
-                  const audio = new Audio(url);
-                  audio.play().catch(console.warn);
+                onClick={async () => {
+                  try {
+                    const url = await getAudioUrl({
+                      surahNumber: surahNumber,
+                      ayahNumber: ayahNumber,
+                      reciterId: selectedReciterId,
+                    });
+                    const audio = new Audio(url);
+                    audio.play().catch(console.warn);
+                  } catch (error) {
+                    console.warn('Failed to get audio URL:', error);
+                  }
                 }}
                 style={{ padding: '0.5rem', fontSize: '0.8rem' }}
                 title="Play recitation audio"
