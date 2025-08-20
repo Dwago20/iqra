@@ -157,6 +157,7 @@ function App() {
                     ayah={currentAyah}
                     surahName={currentSurahData?.name}
                     ayahNumber={selectedAyah}
+                    surahNumber={selectedSurah}
                   />
                 )}
 
