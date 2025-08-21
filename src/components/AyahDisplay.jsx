@@ -1,11 +1,128 @@
-import React, { useState } from 'react';
-import { Volume2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Volume2, Play, Pause, RotateCcw, Repeat, Gauge } from 'lucide-react';
 import { sanitizeTajweedHtml } from '../utils/sanitizeHtml';
 import { getAudioUrl } from '../api/quranClient';
 
 const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciterId = 5, settings }) => {
   const showTajweed = settings?.showTajweed ?? true;
   const largeArabicFont = settings?.largeArabicFont ?? false;
+  
+  // Audio player state
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLooping, setIsLooping] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Speed options
+  const speedOptions = [0.5, 0.75, 1, 1.25, 1.5];
+
+  // Load audio URL when ayah/reciter changes
+  useEffect(() => {
+    loadAudioUrl();
+  }, [ayahNumber, surahNumber, selectedReciterId]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const loadAudioUrl = async () => {
+    try {
+      setLoading(true);
+      const url = await getAudioUrl({
+        surahNumber: surahNumber,
+        ayahNumber: ayahNumber,
+        reciterId: selectedReciterId,
+      });
+      setAudioUrl(url);
+    } catch (error) {
+      console.warn('Failed to get audio URL:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeAudio = () => {
+    if (audioUrl && !audioRef.current) {
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.playbackRate = playbackRate;
+      audioRef.current.loop = isLooping;
+      
+      audioRef.current.addEventListener('ended', () => {
+        if (!isLooping) {
+          setIsPlaying(false);
+        }
+      });
+      
+      audioRef.current.addEventListener('pause', () => {
+        setIsPlaying(false);
+      });
+      
+      audioRef.current.addEventListener('play', () => {
+        setIsPlaying(true);
+      });
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (!audioUrl) return;
+    
+    initializeAudio();
+    
+    if (isPlaying) {
+      audioRef.current?.pause();
+    } else {
+      audioRef.current?.play().catch(console.warn);
+    }
+  };
+
+  const restartAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      if (isPlaying) {
+        audioRef.current.play().catch(console.warn);
+      }
+    }
+  };
+
+  const toggleLoop = () => {
+    const newLooping = !isLooping;
+    setIsLooping(newLooping);
+    if (audioRef.current) {
+      audioRef.current.loop = newLooping;
+    }
+  };
+
+  const changeSpeed = (rate) => {
+    setPlaybackRate(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  };
+
+  // Update audio settings when state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate;
+      audioRef.current.loop = isLooping;
+    }
+  }, [playbackRate, isLooping]);
+
+  // Reset audio when URL changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlaying(false);
+    }
+  }, [audioUrl]);
 
   const renderTajweedText = () => {
     // New: Check for tajweedHtml (from Quran Foundation API) first
@@ -62,7 +179,7 @@ const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciter
             <h4 style={{ margin: 0, fontSize: '1rem', color: '#6b7280' }}>
               Arabic Text
             </h4>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <button
                 className="button secondary"
                 onClick={() => speakText(ayah.arabic || ayah.textArabic)}
@@ -71,29 +188,140 @@ const AyahDisplay = ({ ayah, surahName, ayahNumber, surahNumber, selectedReciter
               >
                 <Volume2 size={16} />
               </button>
-              <button
-                className="button secondary"
-                onClick={async () => {
-                  try {
-                    const url = await getAudioUrl({
-                      surahNumber: surahNumber,
-                      ayahNumber: ayahNumber,
-                      reciterId: selectedReciterId,
-                    });
-                    const audio = new Audio(url);
-                    audio.play().catch(console.warn);
-                  } catch (error) {
-                    console.warn('Failed to get audio URL:', error);
-                  }
-                }}
-                style={{ padding: '0.5rem', fontSize: '0.8rem' }}
-                title="Play recitation audio"
-              >
-                Play
-              </button>
-              
             </div>
           </div>
+          
+          {/* Practice Mode Audio Controls */}
+          <div style={{
+            background: 'var(--bg-accent)',
+            padding: 'var(--space-md)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border-light)',
+            marginBottom: 'var(--space-md)'
+          }}>
+            <h5 style={{ 
+              margin: '0 0 0.75rem 0', 
+              fontSize: '0.875rem', 
+              fontWeight: '600',
+              color: 'var(--text-primary)'
+            }}>
+              🎧 Practice Mode
+            </h5>
+            
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.75rem',
+              flexWrap: 'wrap'
+            }}>
+              {/* Play/Pause Button */}
+              <button
+                className="button"
+                onClick={togglePlayPause}
+                disabled={loading || !audioUrl}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  background: isPlaying ? 'var(--warning-color)' : 'var(--primary-color)',
+                  opacity: loading || !audioUrl ? 0.6 : 1
+                }}
+                title={isPlaying ? 'Pause audio' : 'Play audio'}
+              >
+                {loading ? (
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid transparent',
+                    borderTop: '2px solid currentColor',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                ) : isPlaying ? (
+                  <Pause size={16} />
+                ) : (
+                  <Play size={16} />
+                )}
+                {loading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}
+              </button>
+
+              {/* Restart Button */}
+              <button
+                className="button secondary"
+                onClick={restartAudio}
+                disabled={!audioUrl}
+                style={{
+                  padding: '0.5rem',
+                  opacity: !audioUrl ? 0.6 : 1
+                }}
+                title="Restart from beginning"
+              >
+                <RotateCcw size={16} />
+              </button>
+
+              {/* Loop Toggle */}
+              <button
+                className="button secondary"
+                onClick={toggleLoop}
+                disabled={!audioUrl}
+                style={{
+                  padding: '0.5rem',
+                  background: isLooping ? 'var(--primary-color)' : 'transparent',
+                  color: isLooping ? 'white' : 'var(--text-secondary)',
+                  opacity: !audioUrl ? 0.6 : 1
+                }}
+                title={isLooping ? 'Disable loop' : 'Enable loop'}
+              >
+                <Repeat size={16} />
+              </button>
+
+              {/* Speed Control */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem',
+                marginLeft: '0.5rem'
+              }}>
+                <Gauge size={16} style={{ color: 'var(--text-muted)' }} />
+                <select
+                  value={playbackRate}
+                  onChange={(e) => changeSpeed(parseFloat(e.target.value))}
+                  disabled={!audioUrl}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    background: 'var(--bg-primary)',
+                    opacity: !audioUrl ? 0.6 : 1
+                  }}
+                  title="Playback speed"
+                >
+                  {speedOptions.map(speed => (
+                    <option key={speed} value={speed}>
+                      {speed}x
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {isLooping && (
+              <div style={{
+                marginTop: '0.5rem',
+                padding: '0.5rem',
+                background: 'var(--primary-color)',
+                color: 'white',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.75rem',
+                textAlign: 'center'
+              }}>
+                🔄 Loop mode active - Audio will repeat automatically
+              </div>
+            )}
+          </div>
+          
           <div 
             className="arabic-text ayah-text" 
             dir="rtl" 
