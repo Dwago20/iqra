@@ -182,7 +182,6 @@ function App() {
             <div className="grid grid-2">
               <div className="practice-content">
                 <SurahPicker
-                  availableSurahs={selectedModule?.surahs || []}
                   selectedSurah={selectedSurah}
                   selectedAyah={selectedAyah}
                   onSurahChange={handleSurahChange}

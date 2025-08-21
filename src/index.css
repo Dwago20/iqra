@@ -328,6 +328,25 @@ body {
   letter-spacing: 0.1px;
 }
 
+/* Loading animation for skeleton loaders */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Highlight for mismatched text */
 .mismatch {
   background-color: rgba(239, 68, 68, 0.2);
